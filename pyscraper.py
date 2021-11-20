@@ -103,4 +103,51 @@ class Scraper:
             # 예외처리를 해주지 않으면 프로그램이 그대로 종료된다. 이를 방지하기 위함.
             self.count -= 1
             print(f"[Error]Issue on url: {url}\n{e}")
+        
+    def run(self):
+        # 페이지를 순회하며 각 페이지 내 최대 이미지 수만큼 수집한다(최대 이미지 수는 max_count)
+        # 만약 한 페이지에서 모든 이미지를 수집하지 못한 경우(수집 중 에러) 다음 페이지로 넘어가게 된다.
+        while self.count < self.max_count:
+            print(f"[Info]parsing page {self.page_counter + 1}")
+
+            # q : search name(class)
+            # first : number of page
+            # count : number of item 
+            page_url = f"https://www.bing.com/images/async?\
+                        q={urllib.parse.quote_plus(self.class_name)} \
+                        &first={str(self.page_counter)} \
+                        &count={str(self.max_count)}"
+
+            # 한 페이지(page_url) 내 모든 이미지 url 추출 -> links
+            req = urllib.request.Request(page_url, None, headers=self.headers)
+            resp = urllib.request.urlopen(req)
+            html = resp.read().decode('utf8')
+            links = re.findall('murl&quot;:&quot;(.*?)&quot;', html)
+            # --- monitering ---
+            print(f"[Info]Indexed {len(links)} images on parsing page {self.page_counter + 1}.")
+            print("===================================================")
+            # ------------------
+
+            # 각 이미지 순회하며 call_save_img() 호출 -> 내부 save_img() 함수를 통해 이미지 파일 저장
+            for link in links:
+                if self.count < self.max_count:
+                    self.call_save_img(link)
+                else:
+                    # 지정한 최대 이미지 수 만큼만 해당 이미지 링크에 접근하고(이미지저장) loop 통과
+                    print("===================================================")
+                    break
+            
+            # --- monitering ---
+            print(f"[Info] Done. Saved {self.count} images")
+            # ------------------
+            
+            # 페이지 번호를 올린다. 만약 현재 페이지에서 모든 이미지를 수집하지 못했다면,
+            # 다음 페이지에서 남은 이미지를 수집하게 된다.
+            self.page_counter += 1
+        
+                
+
+                    
+            
+            
             
