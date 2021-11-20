@@ -22,11 +22,11 @@ class Scraper:
         # ---- 인자 변수화 ----
         self.class_name = class_name
         ## 예외 처리
-        assert type(num_imgs) == int, "limit must be integer"
+        assert type(num_imgs) == int, "'num_imgs' must be integer"
         self.num_imgs = num_imgs 
         self.class_dir = class_dir 
         ## 예외 처리
-        assert type(limit_time) == int, "timeout must be integer"
+        assert type(limit_time) == int, "'limit_time' must be integer"
         self.limit_time = limit_time
         # -----------------
 
