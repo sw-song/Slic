@@ -1,19 +1,23 @@
 from pathlib import Path
 import os
-# 인자 및 사용자 모듈 제어
+# sys : 인자 및 사용자 모듈 제어
 import sys
-# url 핸들링
+# urllib : url 핸들링
 import urllib.request
 import urllib
-# 이미지 유형 인식
+# imghdr : 이미지 유형 인식
 import imghdr
-# 운영체제별 '호환성' 제공
+# posixpath : 모든 os에서 unix 형태 경로 제어 ('호환성' 제공)
 import posixpath
-# regex(정규표현식)
+# re : regex(정규표현식)
 import re
 
 class Scraper:
     def __init__(self, class_name, max_count, class_dir, limit_time):
+    #=> class_name : 이미지 분류 클래스 명(수집 대상 쿼리명)
+    #=> max_count : 수집하려는 이미지 수
+    #=> class_dir : 클래스가 저장될 폴더 명
+    #=> limit_time : 이미지 수집시 최대 소요 시간 설정
 
         # ---- 인자 변수화 ----
         self.class_name = class_name
@@ -35,9 +39,11 @@ class Scraper:
 
     # image 한 장에 대한 처리(저장) -- call from call_save_img()
     def save_img(self, url, save_path):
+        
         # urllib.request.Request(url, data=None, headers={}, origin_req_host=None, unverifiable=False)
         # data는 post 방식 url 호출시 전달
         req = urllib.request.Request(url, None, self.headers)
+        
         # urlopen은 인자로 url 자체를 받거나 url request Object를 받는다.
         # 웹 데이터 수집시 크롤러 감지를 피하기 위해 header를 같이 넣어줘야 하므로,
         # url request Object를 담은 req 변수를 인자로 전달한다.
@@ -51,11 +57,13 @@ class Scraper:
             # 이미지 파일이 아닌 경우
             print(f'[Error] detected invalid image .. {img}')
             raise
+        
         # 이미지 파일이 맞다면 바이너리 데이터를 파일(이미지)로 저장한다.
         with open(save_path, 'wb') as f:
             f.write(img)
         
     def call_save_img(self, url):
+        
         # 데이터 수집 카운터 1 증가(사용자가 입력한 max_count와 비교)
         self.count += 1
         # 일반적으로 모든 환경에서 사용 가능한 이미지 파일 확장자
@@ -64,48 +72,35 @@ class Scraper:
         try:
             # urllib.parse는 url 구성요소를 제어
             # urlsplit()은 각 구성요소를 분할하여 담은 객체 반환
-            # 프로토콜(https://) 도메인(www.~~.com/) 다음에 오는 '경로' 추출
+            # 객체에서 path는 프로토콜(https://) 도메인(www.~~.com/) 다음에 오는 '경로'를 가짐
             path = urllib.parse.urlsplit(url).path
-            # basename()은 url 중 path 문자열에서 마지막 '/' 이후 문자열을 추출
-            # 추출한 문자열에 쿼리스트링('?'로 시작)이 포함되어 있다면 그 전까지만 추출
+
+            # basename()은 url 중 path 문자열에서 마지막 '/' 이후의 문자열을 추출
+            # .split('?')[0] -> 추출한 문자열에 쿼리스트링('?'로 시작)이 포함되어 있다면 그 전까지만 추출
             filename = posixpath.basename(path).split('?')[0]
-            # 추출한 filename에서 다시 확장자만 추출
+            
+            # 추출한 filename에서 다시 확장자만 추출하여 file_type에 저장
             file_type = filename.split('.')[-1]
+
+            # 예외적인 확장자들은 jpg로 변환
             if file_type.lower() not in default_file_types:
-                # 예외적인 확장자들은 jpg로 변환
                 file_type = "jpg"
             
             # ---- scraping and monitering ----
             print(f"([{self.count}]extracting image from '{url}'...)")
+            
             ## Extract Image from Web(url)
-            ## os.getcwd()는 현재 파이썬 실행파일의 디렉토리 위치를 반환한다.
+            ## os.getcwd()는 현재 파이썬 실행파일의 디렉토리 위치를 반환
             self.save_img(
                 url,
                 f"{os.getcwd()}/{self.class_dir}/{self.class_name}/image_{self.count}.{file_type}"
                 )
             print("(...extract done!)")
-        # (try)예외 처리
+
+        # try에 대한 예외 처리
         except Exception as e:
             # 이미지로 수집이 불가능한 데이터의 경우 에러 메시지를 띄우고 count를 올리지 않는다.
             # 예외처리를 해주지 않으면 프로그램이 그대로 종료된다. 이를 방지하기 위함.
             self.count -= 1
             print(f"[Error]Issue on url: {url}\n{e}")
-             
-
             
-            
-            
-
-            
-
-            
-            
-            
-
-
-
-
-    
-
-
-
