@@ -2,6 +2,8 @@
 import os
 # shell utility (파일 및 디렉토리 작업)
 import shutil
+# cli 명령 실행시 인자 전달
+import argparse
 from scraper import Scraper
 
 def slic(class_name, num_imgs=30, class_dir="datasets", limit_time=10, force_replace_all=False, force_replace=False):
@@ -51,5 +53,20 @@ def slic(class_name, num_imgs=30, class_dir="datasets", limit_time=10, force_rep
     scraper.run()
     
 if __name__ == '__main__':
-    slic('cat', num_imgs=10, limit_time='1')
-        
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--class_name', type=str, nargs='+')
+    parser.add_argument('-n', '--num_imgs', type=int, default=30)
+    parser.add_argument('-d', '--dir', type=str, default="datasets")
+    parser.add_argument('-t', '--limit_time', type=int, default=10)
+    parser.add_argument('-a', '--force_all', type=bool, default=False)
+    parser.add_argument('-f', '--force', type=bool, default=False)
+    
+    args = parser.parse_args()
+    print(args.class_name)
+    for i in range(len(args.class_name)):
+        slic(args.class_name[i],
+             args.num_imgs,
+             args.dir,
+             args.limit_time,
+             args.force_all,
+             args.force)
