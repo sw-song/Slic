@@ -13,10 +13,10 @@ import posixpath
 import re
 
 class Scraper:
-    def __init__(self, class_name, max_count, class_dir, limit_time):
+    def __init__(self, class_name, max_count, folder_name, limit_time):
     #=> class_name : 이미지 분류 클래스 명(수집 대상 쿼리명)
     #=> max_count : 수집하려는 이미지 수
-    #=> class_dir : 클래스가 저장될 폴더 명
+    #=> folder_name : 클래스가 저장될 폴더 명
     #=> limit_time : 이미지 수집시 최대 소요 시간 설정
 
         # ---- 인자 변수화 ----
@@ -24,7 +24,7 @@ class Scraper:
         ## 예외 처리
         assert type(max_count) == int, "limit must be integer"
         self.max_count = max_count 
-        self.class_dir = class_dir 
+        self.folder_name = folder_name 
         ## 예외 처리
         assert type(limit_time) == int, "timeout must be integer"
         self.limit_time = limit_time
@@ -93,7 +93,7 @@ class Scraper:
             ## os.getcwd()는 현재 파이썬 실행파일의 디렉토리 위치를 반환
             self.save_img(
                 url,
-                f"{os.getcwd()}/{self.class_dir}/{self.class_name}/image_{self.count}.{file_type}"
+                f"{os.getcwd()}/{self.folder_name}/{self.class_name}/image_{self.count}.{file_type}"
                 )
             print("(...extract done!)")
 
