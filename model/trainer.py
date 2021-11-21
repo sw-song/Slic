@@ -104,7 +104,8 @@ class Trainer:
 
         # epoch(default : 16)을 1씩 증가하며 순회한다.       
         for epoch in range(self.num_epochs):
-            loss = 0.
+            running_loss = 0.
+            running_acc = 0
 
             # mini-batch(default : 4)를 1씩 증가하며 순회한다.
             for batch_imgs, batch_labels in train_dataloader:
@@ -120,15 +121,34 @@ class Trainer:
                 # 즉, label이 [a,b,c]가 있을 때, a에 해당하는 이미지가 a일 확률, b일 확률, c일 확률을 반환한다.
                 outputs = self.model(inputs)
                 
-                # torch.max 메서드는 첫번째 인자로 최대값의 인덱스를, 두번째 인자로 최대값을 반환한다.
-                # 여기서는 '최대값'만 필요하므로 인덱스는 무시한다.
+                # torch.max 메서드는 첫번째 인자로 최댓값을, 두번째 인자로 최댓값의 위치(인덱스)를 반환한다.
+                # 여기서는 '최대값'은 값 자체로는 의미가 없으므로(softmax 처리 전이기 때문),
+                # 최댓값의 위치(인덱스)만 가져온다.
                 # 또한, 최대값은 batch 수만큼 넘어온다. 이미지 4개를 받았으면 최대값도 4개다.
                 _, preds = torch.max(outputs, 1)
 
                 # 아래 손실함수는 내부적으로 softmax 활성화 함수가 사용하므로,
                 # 전달받은 outputs들의 총합을 1이 되도록 각 확률값을 변환한 다음 labels와 비교한다.
                 # labels는 원-핫 형태의 텐서를 총 batch-size만큼 가지고 있다.
+                # 이미지 1장에 대한 예) outputs : [0.98, 0.01, 0.01] <-> labels : [1, 0, 0]
                 loss = self.criterion(outputs, labels)
+                
+                # 역전파 구간 - loss를 줄이는 방향의 기울기(미분값) 수집
+                loss.backward()
+                # 수집한 기울기와 여러 최적화 파라미터로 가중치(w) 업데이트
+                self.optimizer.step()
+
+                # --- 모니터링을 위해 실시간(배치별) loss, accuracy 수집 ---
+                running_loss += loss.item() * inputs.size(0)
+                running_acc += torch.sum(p)
+
+
+                
+                
+                
+
+
+
 
 
 
