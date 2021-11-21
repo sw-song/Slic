@@ -13,10 +13,10 @@ import posixpath
 import re
 
 class Scraper:
-    def __init__(self, class_name, num_imgs, class_dir, limit_time):
+    def __init__(self, class_name, num_imgs, save_folder, limit_time):
     #=> class_name : 이미지 분류 클래스 명(수집 대상 쿼리명)
     #=> num_imgs : 수집하려는 이미지 수
-    #=> class_dir : 클래스가 저장될 폴더 명
+    #=> save_folder : 클래스가 저장될 폴더 명
     #=> limit_time : 이미지 수집시 최대 소요 시간 설정
 
         # ---- 인자 변수화 ----
@@ -24,7 +24,7 @@ class Scraper:
         ## 예외 처리
         assert type(num_imgs) == int, "'num_imgs' must be integer"
         self.num_imgs = num_imgs 
-        self.class_dir = class_dir 
+        self.save_folder = save_folder 
         ## 예외 처리
         assert type(limit_time) == int, "'limit_time' must be integer"
         self.limit_time = limit_time
@@ -87,28 +87,28 @@ class Scraper:
                 file_type = "jpg"
             
             # ---- scraping and monitering ----
-            print(f"([{self.count}]extracting image from '{url}'...)")
+            print(f"[Info] ({self.count})extracting image from '{url}'...")
             
             ## Extract Image from Web(url)
             ## os.getcwd()는 현재 파이썬 실행파일의 디렉토리 위치를 반환
             self.save_img(
                 url,
-                f"{os.getcwd()}/{self.class_dir}/{self.class_name}/image_{self.count}.{file_type}"
+                f"{os.getcwd()}/{self.save_folder}/{self.class_name}/image_{self.count}.{file_type}"
                 )
-            print("(...extract done!)")
+            print("[Info]...extract done!")
 
         # try에 대한 예외 처리
         except Exception as e:
             # 이미지로 수집이 불가능한 데이터의 경우 에러 메시지를 띄우고 count를 올리지 않는다.
             # 예외처리를 해주지 않으면 프로그램이 그대로 종료된다. 이를 방지하기 위함.
             self.count -= 1
-            print(f"[Error]Issue on url: {url}\n{e}")
+            print(f"[Info] ##Error Issue on url: {url}\n{e}")
         
     def run(self):
         # 페이지를 순회하며 각 페이지 내 최대 이미지 수만큼 수집한다(최대 이미지 수는 num_imgs)
         # 만약 한 페이지에서 모든 이미지를 수집하지 못한 경우(수집 중 에러) 다음 페이지로 넘어가게 된다.
         while self.count < self.num_imgs:
-            print(f"[Info]parsing page {self.page_counter + 1}")
+            print(f"[Info] parsing page {self.page_counter + 1}")
 
             # q : search name(class)
             # first : number of page
@@ -124,7 +124,7 @@ class Scraper:
             html = resp.read().decode('utf8')
             links = re.findall('murl&quot;:&quot;(.*?)&quot;', html)
             # --- monitering ---
-            print(f"[Info]Indexed {len(links)} images on parsing page {self.page_counter + 1}.")
+            print(f"[Info] Indexed {len(links)} images on parsing page {self.page_counter + 1}.")
             print("===================================================")
             # ------------------
 
