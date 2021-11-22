@@ -1,6 +1,6 @@
 from torchvision import transforms
 
-def transformer(num_classes):
+def transformer():
 
     # transforms : 이미지 데이터 처리(변형, 조작, 증강)
     transforms_train = transforms.Compose([

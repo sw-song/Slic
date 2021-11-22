@@ -56,14 +56,12 @@ class Trainer:
 
         # ---- 특정 폴더를 지정하고, 데이터 전처리를 통해 데이터를 불러오는 구간 ----
         print("[Info] 데이터 로드 중 ..")
-        from_dataset = torchvision.datasets.ImageFolder()
-
-        train_datasets = from_dataset(
+        train_datasets = torchvision.datasets.ImageFolder(
             os.path.join(self.data_path, 'train'),
             self.trans_train
        )
 
-        test_datasets = from_dataset(
+        test_datasets = torchvision.datasets.ImageFolder(
             os.path.join(self.data_path, 'test'), 
             self.trans_test
         )
@@ -73,21 +71,20 @@ class Trainer:
         # ----------------------------------------------------------
     
         # ---- 데이터들을 미니배치로 모델에 전달하기 위해 dataloader api 사용 ----
-        dataloader = torch.utils.data.DataLoader()
-        
-        train_dataloader = dataloader(
+        train_dataloader = torch.utils.data.DataLoader(
             train_datasets,
             batch_size=self.batch_size,
             shuffle=self.shuffle
         )
 
-        test_dataloader = dataloader(
+        test_dataloader = torch.utils.data.DataLoader(
             test_datasets,
             batch_size=self.batch_size,
             shuffle=self.shuffle
         )
 
-        return (train_dataloader, test_dataloader)
+        return (train_dataloader, len(train_datasets), 
+                test_dataloader, len(test_datasets))
 
     
     def calculate(self):
@@ -100,7 +97,7 @@ class Trainer:
         # (모니터링)학습 시간 측정을 위해 학습 시작 시간을 기록한다.
         start_time = time.time()
 
-        train_dataloader, test_dataloader = self.load_dataset()
+        train_dataloader, train_len, _, _ = self.load_dataset()
 
         # epoch(default : 16)을 1씩 증가하며 순회한다.       
         for epoch in range(self.num_epochs):
@@ -129,8 +126,10 @@ class Trainer:
 
                 # 아래 손실함수는 내부적으로 softmax 활성화 함수가 사용하므로,
                 # 전달받은 outputs들의 총합을 1이 되도록 각 확률값을 변환한 다음 labels와 비교한다.
-                # labels는 원-핫 형태의 텐서를 총 batch-size만큼 가지고 있다.
-                # 이미지 1장에 대한 예) outputs : [0.98, 0.01, 0.01] <-> labels : [1, 0, 0]
+                # 위에서 label을 [a,b,c]로 가정했으나 실제로 [0,1,2] 처럼 인덱스 배열로 되어있다.
+                # 이미지 1장에 대해 단순화한 예) outputs : [0.02, 0.01, 0.97] --> labels : [2]
+                # 그래서 아래 손실함수를 계산하게 되면(실제 수식이 아님, 아주 단순화한 형태)
+                # sum(outputs) - outputs[labels[0]] 로 계산되고 제대로 예측했다면 loss는 0에 가깝게 나올 것이다.
                 loss = self.criterion(outputs, labels)
                 
                 # 역전파 구간 - loss를 줄이는 방향의 기울기(미분값) 수집
@@ -139,8 +138,16 @@ class Trainer:
                 self.optimizer.step()
 
                 # --- 모니터링을 위해 실시간(배치별) loss, accuracy 수집 ---
+                # 위에서 구한 loss는 내부적으로 배치값으로 나눈 평균이므로 다시 배치사이즈를 곱해줘서 배치 전체에 대한 loss 총손실을 구해준다.
                 running_loss += loss.item() * inputs.size(0)
-                running_acc += torch.sum(p)
+                # preds도 인덱스, labels도 인덱스므로 비교가능하고, 배치사이즈만큼 비교해서 일치하는 갯수 만큼 올려준다.
+                running_acc += torch.sum(preds == labels.data)
+
+            epoch_loss = running_loss / train_len
+            epoch_acc = running_acc / train_len * 100
+
+            # ---- 모델 학습 모니터링 ----
+            print(f"Epoch : {epoch} Loss : {epoch_loss:.2f} Accuracy : {epoch_acc:.2f} Time : {time.time() - start_time}")
 
 
                 
