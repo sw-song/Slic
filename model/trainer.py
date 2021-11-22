@@ -87,7 +87,7 @@ class Trainer:
                 test_dataloader, len(test_datasets))
 
     
-    def calculate(self):
+    def run(self):
         
         # 모델 레이어들에 대해 train 모드를 적용한다
         # 모드는 train 혹은 evel로 설정 가능하며,
