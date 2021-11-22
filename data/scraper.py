@@ -47,7 +47,7 @@ class Scraper:
         # urlopen은 인자로 url 자체를 받거나 url request Object를 받는다.
         # 웹 데이터 수집시 크롤러 감지를 피하기 위해 header를 같이 넣어줘야 하므로,
         # url request Object를 담은 req 변수를 인자로 전달한다.
-        img = urllib.request.urlopen(req).read()
+        img = urllib.request.urlopen(req, timeout=self.limit_time).read()
         # urlopen(url)은 Request()처럼 객체를 반환한다. 객체 정보를 읽기 위해 read() 메서드를 사용했다.
         # 이 때 read()로 읽어들인(default option의 경우) 데이터는 바이너리 데이터다. 
         

@@ -48,7 +48,8 @@ class Trainer:
         # 데이터 폴더 지정
         cwd = os.getcwd()
         self.data_path = os.path.join(cwd, data_folder)
-        self.class_list = os.listdir(self.data_path)
+        self.class_list = os.listdir(f"{self.data_path}/train")
+        self.class_list = [f for f in self.class_list if not '.' in f]
         
         # 학습에 필요한 파라미터들
         self.batch_size = batch_size
@@ -97,18 +98,20 @@ class Trainer:
         # eval 모드로 설정하는 경우 dropout, batchnorm layer 등을 제한한다.
         self.model.train()
 
-        # (모니터링)학습 시간 측정을 위해 학습 시작 시간을 기록한다.
-        start_time = time.time()
 
         train_dataloader, train_len, _, _ = self.load_dataset()
 
         # epoch(default : 16)을 1씩 증가하며 순회한다.       
         for epoch in range(self.num_epochs):
+            # (모니터링)학습 시간 측정을 위해 학습 시작 시간을 기록한다.
+            start_time = time.time()
+            
             running_loss = 0.
             running_acc = 0
 
             # mini-batch(default : 4)를 1씩 증가하며 순회한다.
             for batch_imgs, batch_labels in train_dataloader:
+                
                 # tensor로 표현된 이미지를 batch size(개) 만큼 device에 올림
                 inputs = batch_imgs.to(self.device)
                 # 배치 내 각 이미지에 대한 label tensor를 device에 올림
@@ -150,7 +153,7 @@ class Trainer:
             epoch_acc = running_acc / train_len * 100
 
             # ---- 모델 학습 모니터링 ----
-            print(f"[Info] Epoch : {epoch} Loss : {epoch_loss:.2f} Accuracy : {epoch_acc:.2f} Time : {time.time() - start_time}")
+            print(f"[Info] Epoch : {epoch + 1} Loss : {epoch_loss:.2f} Accuracy : {epoch_acc:.2f} Time : {time.time() - start_time}")
 
     def eval(self):
 
@@ -170,6 +173,7 @@ class Trainer:
 
             # run()과 동일한 매커니즘으로, 가중치 업데이트 부분만 제외한다.
             for batch_imgs, batch_labels in test_dataloader:
+
                 inputs = batch_imgs.to(self.device)
                 labels = batch_labels.to(self.device)
 
@@ -181,13 +185,12 @@ class Trainer:
                 running_acc += torch.sum(preds == labels.data)
                 
                 batch_count += 1
-                for i in range(preds):
-                    print(f"[Info] Batch ({batch_count}) \
-                            - predict : {self.class_list[preds[i]]} \
-                            - real : {self.class_list[labels[i]]}")
+                print(f"[Info] Batch : {batch_count}")
+                for i in range(len(preds)):
+                    print(f"\t- predict : {self.class_list[preds[i]]} - real : {self.class_list[labels[i]]}")
             
-            eval_loss = running_loss / len(test_len)
-            eval_acc = running_acc / len(test_len) * 100
+            eval_loss = running_loss / test_len
+            eval_acc = running_acc / test_len * 100
 
             # ---- 평가 모니터링 ----
             print(f"[Info] Loss : {eval_loss:.2f} Accuracy : {eval_acc:.2f} Time : {time.time() - start_time}")
@@ -208,7 +211,7 @@ if __name__ == '__main__':
     
     t = Trainer(
         args.data_folder,
-        args.out_dims,
+        args.out_dims[0],
         args.batch_size,
         args.shuffle,
         args.num_epochs
