@@ -46,6 +46,7 @@ class Trainer:
         # 데이터 폴더 지정
         cwd = os.getcwd()
         self.data_path = os.path.join(cwd, data_folder)
+        self.class_list = os.listdir(self.data_path)
         
         # 학습에 필요한 파라미터들
         self.batch_size = batch_size
@@ -147,7 +148,49 @@ class Trainer:
             epoch_acc = running_acc / train_len * 100
 
             # ---- 모델 학습 모니터링 ----
-            print(f"Epoch : {epoch} Loss : {epoch_loss:.2f} Accuracy : {epoch_acc:.2f} Time : {time.time() - start_time}")
+            print(f"[Info] Epoch : {epoch} Loss : {epoch_loss:.2f} Accuracy : {epoch_acc:.2f} Time : {time.time() - start_time}")
+
+    def eval(self):
+
+        # 평가 모드 적용
+        self.model.eval()
+        
+        start_time = time.time()
+
+        _, _, test_dataloader, test_len = self.load_dataset()
+
+        batch_count = 0
+
+        # 가중치 추적을 하지 않는다(학습이 아니므로)
+        with torch.no_grad():
+            running_loss = 0.
+            running_acc = 0
+
+            # run()과 동일한 매커니즘으로, 가중치 업데이트 부분만 제외한다.
+            for batch_imgs, batch_labels in test_dataloader:
+                inputs = batch_imgs.to(self.device)
+                labels = batch_labels.to(self.device)
+
+                outputs = self.model(inputs)
+                _, preds = torch.max(outputs, 1)
+                loss = self.criterion(outputs, labels)
+
+                running_loss += loss.item() * inputs.size(0)
+                running_acc += torch.sum(preds == labels.data)
+                
+                batch_count += 1
+                for i in range(preds):
+                    print(f"[Info] Batch ({batch_count}) \
+                            - predict : {self.class_list[preds[i]]} \
+                            - real : {self.class_list[labels[i]]}")
+            
+            eval_loss = running_loss / len(test_len)
+            eval_acc = running_acc / len(test_len) * 100
+
+            # ---- 평가 모니터링 ----
+            print(f"[Info] Loss : {eval_loss:.2f} Accuracy : {eval_acc:.2f} Time : {time.time() - start_time}")
+            
+
 
 
                 
