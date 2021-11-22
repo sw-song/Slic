@@ -90,13 +90,14 @@ if __name__ == '__main__':
     parser.add_argument('-l', '--limit_time', type=int, default=10)
     parser.add_argument('-a', '--force_all', type=bool, default=False)
     parser.add_argument('-f', '--force', type=bool, default=False)
-    parser.add_argument('-t', '--train', type=bool, default=False)
+    parser.add_argument('-t', '--train', type=bool, default=True)
     parser.add_argument('-s', '--train_size', type=int, default=10)
     
     args = parser.parse_args()
     print(args.class_name)
     for i in range(len(args.class_name)):
-        create_dataset(args.class_name[i],
+        create_dataset(
+             args.class_name[i],
              args.num_imgs,
              args.save_path,
              args.limit_time,

@@ -13,6 +13,8 @@ import numpy as np
 # time : 시간 불러오기 등, 모니터링을 위함
 import time
 
+import argparse
+
 class Trainer:
 
     def __init__(self, data_folder, out_dims, batch_size=4, shuffle=True, num_epochs=16):
@@ -189,13 +191,33 @@ class Trainer:
 
             # ---- 평가 모니터링 ----
             print(f"[Info] Loss : {eval_loss:.2f} Accuracy : {eval_acc:.2f} Time : {time.time() - start_time}")
-            
 
 
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d', '--data_folder', type=str, default="datasets")
+    parser.add_argument('-o', '--out_dims', type=int, nargs=1)
+    parser.add_argument('-b', '--batch_size', type=int, default=4)
+    parser.add_argument('-s', '--shuffle', type=bool, default=True)
+    parser.add_argument('-e', '--num_epochs', type=int, default=16)
 
-                
-                
-                
+    args = parser.parse_args()
+    print(args.data_folder)
+    
+    t = Trainer(
+        args.data_folder,
+        args.out_dims,
+        args.batch_size,
+        args.shuffle,
+        args.num_epochs
+    )
+    print("#################################")
+    print("[Info] Auto run - training start")
+    t.run()
+    print("##################################")
+    print("[Info] Auto run - evaluation start")
+    t.eval()
+
 
 
 
