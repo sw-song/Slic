@@ -172,3 +172,7 @@ dmypy.json
 cython_debug/
 
 # End of https://www.toptal.com/developers/gitignore/api/python,macos
+
+## 데이터셋, 모델파일 추적금지
+datasets/
+model.pt

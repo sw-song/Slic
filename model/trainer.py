@@ -12,23 +12,41 @@ from transformer import transformer
 import numpy as np
 # time : 시간 불러오기 등, 모니터링을 위함
 import time
+import copy
 
 import argparse
 
 class Trainer:
 
-    def __init__(self, data_folder, out_dims, batch_size=4, shuffle=True, num_epochs=16):
+    def __init__(self, pre=False, model_path="./", data_folder="datasets", batch_size=4, shuffle=True, num_epochs=16):
+
+        # 데이터 폴더 지정
+        cwd = os.getcwd()
+        self.data_path = os.path.join(cwd, data_folder)
+        self.class_list = os.listdir(f"{self.data_path}/train")
+        self.class_list = [f for f in self.class_list if not '.' in f]
+        
+        out_dims = len(self.class_list)
+
         # 사용할 장치 지정
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+        # 훈련된 모델 위치
+        self.model_path = model_path
+
         
-        # transfer learning을 위해 resnet34 사용
-        self.model = torchvision.models.resnet34(pretrained=True)
+        if pre:
+            self.model = torch.load(self.model_path + "model.pt")
+        else:
+            # transfer learning을 위해 resnet34 사용
+            self.model = torchvision.models.resnet34(pretrained=True)
+        
         # fully connected layer 가 입력받는 feature 갯수를 확인해서,
         # 해당 레이어의 출력 feature 수를 우리의 class 수로 변경한다.
         in_dims = self.model.fc.in_features
         self.model.fc = nn.Linear(in_dims, out_dims)
         self.model = self.model.to(self.device)
-    
+        
         # 다중분류를 위한 손실함수로 CrossEntropyLoss 사용
         # 해당 함수는 내부적으로 클래스별 예측 확률 총합을 1로 만드는 Softmax 함수가 포함되어 있어,
         # 별도로 다중분류를 수행하기 위해 활성화 함수(Softmax)를 지정하지 않아도 된다.
@@ -41,15 +59,9 @@ class Trainer:
         # loss를 큰 폭으로 줄일 이유가 없고, underfitting의 가능성이 낮기 때문이다.
         # momentum은 0.9가 최소다. local minima에 빠지지 않도록 학습에 최소한의 관성을 추가한다.
         self.optimizer = optim.SGD(self.model.parameters(), lr=0.001, momentum=0.9)
-
+        
         # 모델 학습을 위한 데이터 전처리 객체(Compose) 저장
         self.trans_train, self.trans_test = transformer()
-        
-        # 데이터 폴더 지정
-        cwd = os.getcwd()
-        self.data_path = os.path.join(cwd, data_folder)
-        self.class_list = os.listdir(f"{self.data_path}/train")
-        self.class_list = [f for f in self.class_list if not '.' in f]
         
         # 학습에 필요한 파라미터들
         self.batch_size = batch_size
@@ -91,15 +103,21 @@ class Trainer:
                 test_dataloader, len(test_datasets))
 
     
-    def run(self):
+    def run(self, pre=False):
         
+        # 최초 학습이 아닌 경우, 학습된 모델을 가져옴
+        if pre:
+            self.model = torch.load(self.model_path + "model.pt")
+            
         # 모델 레이어들에 대해 train 모드를 적용한다
         # 모드는 train 혹은 evel로 설정 가능하며,
         # eval 모드로 설정하는 경우 dropout, batchnorm layer 등을 제한한다.
         self.model.train()
 
-
         train_dataloader, train_len, _, _ = self.load_dataset()
+
+        # model save 조건처리를 위한 변수
+        loss_min = 100
 
         # epoch(default : 16)을 1씩 증가하며 순회한다.       
         for epoch in range(self.num_epochs):
@@ -154,8 +172,13 @@ class Trainer:
 
             # ---- 모델 학습 모니터링 ----
             print(f"[Info] Epoch : {epoch + 1} Loss : {epoch_loss:.2f} Accuracy : {epoch_acc:.2f} Time : {time.time() - start_time}")
+            # -----------------------
 
-    def eval(self):
+            # model 전체 저장
+            if loss_min > loss:
+                torch.save(self.model, self.model_path + "model.pt")
+
+    def test(self):
 
         # 평가 모드 적용
         self.model.eval()
@@ -198,20 +221,21 @@ class Trainer:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('-p', '--pre', type=bool, default=False)
+    parser.add_argument('-m', '--model_path', type=str, default="./")
     parser.add_argument('-d', '--data_folder', type=str, default="datasets")
-    parser.add_argument('-o', '--out_dims', type=int, nargs=1)
     parser.add_argument('-b', '--batch_size', type=int, default=4)
     parser.add_argument('-s', '--shuffle', type=bool, default=True)
     parser.add_argument('-n', '--num_epochs', type=int, default=16)
     parser.add_argument('-t', '--train', type=bool, default=True)
-    parser.add_argument('-e', '--eval', type=bool, default=True)
 
     args = parser.parse_args()
     print(args.data_folder)
     
     t = Trainer(
+        args.pre,
+        args.model_path,
         args.data_folder,
-        args.out_dims[0],
         args.batch_size,
         args.shuffle,
         args.num_epochs
@@ -220,25 +244,11 @@ if __name__ == '__main__':
     if args.train:
         print("#################################")
         print("[Info] Auto run - training start")
-        t.run()
+        if args.pre == True:
+            t.run(pre=True)
+        else:
+            t.run()
         
-        if args.eval:
-            print("##################################")
-            print("[Info] Auto run - evaluation start")
-            t.eval()
-
-
-
-
-
-
-
-
-        
-
-    
-    
-
-    
-
-    
+        print("##################################")
+        print("[Info] Auto run - evaluation start")
+        t.test()
