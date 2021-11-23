@@ -32,13 +32,15 @@ class Trainer:
 
         # 사용할 장치 지정
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        ## cpu-only
+        # self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # 훈련된 모델 위치
         self.model_path = model_path
 
         
         if pre:
-            self.model = torch.load(self.model_path + "model.pt")
+            self.model = torch.load(self.model_path + "model.pt", map_location=torch.device('cpu'))
         else:
             # transfer learning을 위해 resnet34 사용
             self.model = torchvision.models.resnet34(pretrained=True)
@@ -179,6 +181,7 @@ class Trainer:
             # model 전체 저장
             if loss_min > loss:
                 torch.save(self.model, self.model_path + "model.pt")
+                loss_min = loss
 
     def test(self):
 
@@ -225,10 +228,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--pre', type=bool, default=False)
     parser.add_argument('-m', '--model_path', type=str, default="./")
-    parser.add_argument('-d', '--data_folder', type=str, default="datasets")
+    parser.add_argument('-df', '--data_folder', type=str, default="datasets")
     parser.add_argument('-b', '--batch_size', type=int, default=4)
     parser.add_argument('-s', '--shuffle', type=bool, default=True)
-    parser.add_argument('-n', '--num_epochs', type=int, default=16)
+    parser.add_argument('-ne', '--num_epochs', type=int, default=16)
 
     args = parser.parse_args()
     print(args.data_folder)

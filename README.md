@@ -19,11 +19,33 @@
 
 ```
 
-통합 실행하기 위해서는 아래와 같이 `app.py`를 실행하고 -i 옵션을 True로 지정합니다. 만약 데이터셋과 모델이 갖춰져있다면 옵션을 제외할 수 있습니다.
+통합 실행하기 위해서는 아래와 같이 `app.py`를 실행하고 -i 옵션을 True로 지정합니다. 만약 데이터셋과 모델이 갖춰져있다면 옵션을 제외할 수 있습니다. -i 옵션을 추가했다면 이어서 -c 옵션으로 클래스 이름들을 지정해줍니다. 데이터셋부터 초기화하는 것이므로 어떤 데이터를 수집할지 사용자가 직접 선택할 수 있습니다.
 ```python
-$python app.py -i True
+$python app.py -i True -c "class_A" "class_B" "class_C"
 ```
+만약 -i를 True로 지정했음에도 -c 옵션을 추가하지 않는다면 class name을 지정하라는 메시지를 띄웁니다.
 정상적으로 api가 빌드되었다면 localhost 주소를 통해 웹에서 직접 이미지를 업로드하여 모델을 테스트할 수 있습니다.
+
+통합 실행의 경우 각 모듈을 별도로 실행할 때 사용가능한 옵션들을 동일하게 사용할 수 있습니다. 참고할 옵션 파라미터는 아래와 같습니다.
+```python
+parser.add_argument('-i', '--init', type=bool, default=False)
+parser.add_argument('-c', '--class_name', type=str, nargs='+', default=None)
+parser.add_argument('-ni', '--num_imgs', type=int, default=50)
+parser.add_argument('-sf', '--save_folder', type=str, default="datasets")
+parser.add_argument('-l', '--limit_time', type=int, default=10)
+parser.add_argument('-f', '--force_replace', type=bool, default=False)
+parser.add_argument('-t', '--train', type=bool, default=True)
+parser.add_argument('-ts', '--train_size', type=int, default=40)
+parser.add_argument('-p', '--pre', type=bool, default=False)
+parser.add_argument('-m', '--model_path', type=str, default="./")
+parser.add_argument('-df', '--data_folder', type=str, default="datasets")
+parser.add_argument('-b', '--batch_size', type=int, default=4)
+parser.add_argument('-s', '--shuffle', type=bool, default=True)
+parser.add_argument('-ne', '--num_epochs', type=int, default=16)
+```
+
+다음은 정상적으로 빌드되었을 때의 최종 결과물입니다.
+<img src="./_src/test.gif" width="40%" height="40%">
 
 ---
 ## 별도 실행
@@ -37,40 +59,39 @@ root(./slic) directory에서 아래 명령을 실행하면 각 class 이름('cla
 $python ./data/creater.py -c "class_A" "class_B" "class_C"
 ```
 
-만약 모델 학습용 데이터셋을 구축하고자 한다면 아래와 같이 -t 옵션을 true로 추가해줍니다. train_size는 -s 옵션으로 지정할 수 있으며 default는 40입니다. 이렇게 train 모드로 creater.py를 실행하면 ./slic/datasets 안에는 바로 하위 폴더로 train, test 폴더가 생성되며 그 하위에 각각 class별 폴더가 생성됩니다.
+만약 모델 학습용 데이터셋을 구축하고자 한다면 아래와 같이 -c 옵션으로 수집을 위해 웹에서 검색할 이미지 이름을 나열합니. 만약, 모델 학습 목적이 아니라면 -t 옵션을 false로 지정할 수 있습니다. train_size는 -ts 옵션으로 지정할 수 있으며 default는 40입니다. 이렇게 train 모드로 creater.py를 실행하면 ./slic/datasets 안에는 바로 하위 폴더로 train, test 폴더가 생성되며 그 하위에 각각 class별 폴더가 생성됩니다.
 ```sh
-$python ./data/creater.py -c "class_A" "class_B" "class_C" -t True
+$python ./data/creater.py -c "class_A" "class_B" "class_C"
 ```
 
 참고할 옵션 파라미터는 아래와 같습니다.
 ```python
 parser.add_argument('-c', '--class_name', type=str, nargs='+')
-parser.add_argument('-n', '--num_imgs', type=int, default=50)
-parser.add_argument('-d', '--save_folder', type=str, default="datasets")
+parser.add_argument('-ni', '--num_imgs', type=int, default=50)
+parser.add_argument('-sf', '--save_folder', type=str, default="datasets")
 parser.add_argument('-l', '--limit_time', type=int, default=10)
 parser.add_argument('-f', '--force_replace', type=bool, default=False)
-parser.add_argument('-t', '--train', type=bool, default=False)
-parser.add_argument('-s', '--train_size', type=int, default=40)
+parser.add_argument('-t', '--train', type=bool, default=True)
+parser.add_argument('-ts', '--train_size', type=int, default=40)
 ```
 
 ### 2. make classification model(./model/py)
 
-root(./slic) directory에서 아래 명령을 실행하면 `datasets` 폴더에서 train, test 데이터를 가져와 모델 학습이 시작됩니다. 데이터셋 폴더가 다른 이름으로 저장되어 있다면 -d 옵션으로 새롭게 지정할 수 있습니다. 학습 과정에서 가중치 파라미터를 포함한 전체 모델은 default로 root(./slic) directory에 `model.pt`로 저장됩니다. 저장될 경로를 변경하려면 -m 옵션으로 경로를 지정해줄 수 있습니다. 이 옵션은 이미 학습한 모델을 재학습시킬때에도 사용되는데, -m 옵션으로 지정한 경로에서 모델 파일을 불러오기 때문입니다. 
+root(./slic) directory에서 아래 명령을 실행하면 `datasets` 폴더에서 train, test 데이터를 가져와 모델 학습이 시작됩니다. 데이터셋 폴더가 다른 이름으로 저장되어 있다면 -df 옵션으로 새롭게 지정할 수 있습니다. 학습 과정에서 가중치 파라미터를 포함한 전체 모델은 default로 root(./slic) directory에 `model.pt`로 저장됩니다. 저장될 경로를 변경하려면 -m 옵션으로 경로를 지정해줄 수 있습니다. 이 옵션은 이미 학습한 모델을 재학습시킬때에도 사용되는데, -m 옵션으로 지정한 경로에서 모델 파일을 불러오기 때문입니다. 
 ```sh
 $python ./model/trainer.py 
 ```
 
-사용자가 별도로 class 명을 지정해줄 필요가 없습니다. 내부적으로 -d 옵션 혹은 default로 지정된 데이터셋 폴더를 탐색해서 모든 class를 리스트로 불러옵니다.
+사용자가 별도로 class 명을 지정해줄 필요가 없습니다. 내부적으로 -df 옵션 혹은 default로 지정된 데이터셋 폴더를 탐색해서 모든 class를 리스트로 불러옵니다.
 
 참고할 옵션 파라미터는 아래와 같습니다.
 ```python
 parser.add_argument('-p', '--pre', type=bool, default=False)
 parser.add_argument('-m', '--model_path', type=str, default="./")
-parser.add_argument('-d', '--data_folder', type=str, default="datasets")
+parser.add_argument('-df', '--data_folder', type=str, default="datasets")
 parser.add_argument('-b', '--batch_size', type=int, default=4)
 parser.add_argument('-s', '--shuffle', type=bool, default=True)
-parser.add_argument('-n', '--num_epochs', type=int, default=16)
-parser.add_argument('-t', '--train', type=bool, default=True)
+parser.add_argument('-ne', '--num_epochs', type=int, default=16)
 ``` 
 
 ### 3. test prediction (./model/predicter.py)

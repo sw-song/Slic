@@ -4,7 +4,9 @@ import os
 import shutil
 # cli 명령 실행시 인자 전달
 import argparse
-from scraper import Scraper
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+from data.scraper import Scraper
 
 def create_dataset(class_name, num_imgs=50, save_folder="datasets", limit_time=10, \
                    force_replace=False, train=False, train_size=40):
@@ -80,12 +82,12 @@ def create_dataset(class_name, num_imgs=50, save_folder="datasets", limit_time=1
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--class_name', type=str, nargs='+')
-    parser.add_argument('-n', '--num_imgs', type=int, default=50)
-    parser.add_argument('-d', '--save_folder', type=str, default="datasets")
+    parser.add_argument('-ni', '--num_imgs', type=int, default=50)
+    parser.add_argument('-sf', '--save_folder', type=str, default="datasets")
     parser.add_argument('-l', '--limit_time', type=int, default=10)
     parser.add_argument('-f', '--force_replace', type=bool, default=False)
-    parser.add_argument('-t', '--train', type=bool, default=False)
-    parser.add_argument('-s', '--train_size', type=int, default=40)
+    parser.add_argument('-t', '--train', type=bool, default=True)
+    parser.add_argument('-ts', '--train_size', type=int, default=40)
     
     args = parser.parse_args()
     print(args.class_name)
