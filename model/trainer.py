@@ -227,7 +227,6 @@ if __name__ == '__main__':
     parser.add_argument('-b', '--batch_size', type=int, default=4)
     parser.add_argument('-s', '--shuffle', type=bool, default=True)
     parser.add_argument('-n', '--num_epochs', type=int, default=16)
-    parser.add_argument('-t', '--train', type=bool, default=True)
 
     args = parser.parse_args()
     print(args.data_folder)
@@ -241,14 +240,13 @@ if __name__ == '__main__':
         args.num_epochs
     )
     
-    if args.train:
-        print("#################################")
-        print("[Info] Auto run - training start")
-        if args.pre == True:
-            t.run(pre=True)
-        else:
-            t.run()
+    print("#################################")
+    print("[Info] Auto run - training start")
+    if args.pre == True:
+        t.run(pre=True)
+    else:
+        t.run()
         
-        print("##################################")
-        print("[Info] Auto run - evaluation start")
-        t.test()
+    print("##################################")
+    print("[Info] Auto run - evaluation start")
+    t.test()

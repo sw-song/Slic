@@ -2,7 +2,7 @@
 
 ## 통합 실행
 
-본 패키지는 `Single line image classifier`입니다. 단 한 줄의 명령어로 **나만의 이미지 데이터셋을 생성해내고 구성된 데이터셋에 따라 자동으로 이미지 분류 모델을 학습시키며 동시에 api를 개방시킴으로써 외부 사용자의 이미지를 판별할 수 있도록 합니다.** 패키지 구성은 아래와 같습니다.(datasets 폴더와 model.pt의 경우 본 패키지의 사용 방식에 따라 다르게 생성됩니다. 코드 파일이나 아래 "별도 실행"을 참고해주세요.)
+본 패키지는 `Single line image classifier`입니다. **단 한 줄의 명령어로 나만의 이미지 데이터셋을 생성해내고 구성된 데이터셋에 따라 자동으로 이미지 분류 모델을 학습시키며 동시에 api를 개방시킴으로써 외부 사용자의 이미지를 판별할 수 있도록 합니다.** 패키지 구성은 아래와 같습니다.(datasets 폴더와 model.pt의 경우 본 패키지의 사용 방식에 따라 다르게 생성됩니다. 코드 파일이나 아래 "별도 실행"을 참고해주세요.)
 
 ```sh
 |--Slic/
@@ -47,10 +47,12 @@ parser.add_argument('-s', '--train_size', type=int, default=40)
 
 ### 2. model
 
-root(./slic) directory에서 아래 명령을 실행하면 
+root(./slic) directory에서 아래 명령을 실행하면 `datasets` 폴더에서 train, test 데이터를 가져와 모델 학습이 시작됩니다. 데이터셋 폴더가 다른 이름으로 저장되어 있다면 -d 옵션으로 새롭게 지정할 수 있습니다. 학습 과정에서 가중치 파라미터를 포함한 전체 모델은 default로 root(./slic) directory에 `model.pt`로 저장됩니다. 저장될 경로를 변경하려면 -m 옵션으로 경로를 지정해줄 수 있습니다. 이 옵션은 이미 학습한 모델을 재학습시킬때에도 사용되는데, -m 옵션으로 지정한 경로에서 모델 파일을 불러오기 때문입니다. 
 ```sh
+$python ./model/trainer.py 
+```
 
-
+사용자가 별도로 class 명을 지정해줄 필요가 없습니다. 내부적으로 -d 옵션 혹은 default로 지정된 데이터셋 폴더를 탐색해서 모든 class를 리스트로 불러옵니다.
 
 참고할 옵션 파라미터는 아래와 같습니다.
 ```python
@@ -63,3 +65,4 @@ parser.add_argument('-s', '--shuffle', type=bool, default=True)
 parser.add_argument('-n', '--num_epochs', type=int, default=16)
 parser.add_argument('-t', '--train', type=bool, default=True)
 ``` 
+
