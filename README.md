@@ -12,17 +12,25 @@
 |   |--model/
 |       |--trainer.py
 |       |--transformer.py
-|   |--serve/
+|       |--predicter.py
+|   |--app.py
 |   |-(datasets/)
 |   |-(model.pt)
 
 ```
+
+통합 실행하기 위해서는 아래와 같이 `app.py`를 실행하고 -i 옵션을 True로 지정합니다. 만약 데이터셋과 모델이 갖춰져있다면 옵션을 제외할 수 있습니다.
+```python
+$python app.py -i True
+```
+정상적으로 api가 빌드되었다면 localhost 주소를 통해 웹에서 직접 이미지를 업로드하여 모델을 테스트할 수 있습니다.
+
 ---
 ## 별도 실행
 
-본 패키지는 3개의 하위 패키지를 연결하도록 구성되어 있습니다. 따라서 각 기능별로 하위 패키지를 별도로 실행할 수 있으며 데이터셋만 필요한 경우 `data`를, 데이터셋은 이미 폴더별로 구성되어 있고 모델 학습이 필요한 경우 `model`을, 모델 학습까지 완료되었다면 `server` 패키지를 사용하면 되겠습니다.
+본 패키지는 4개의 하위 모듈들을 연결하도록 구성되어 있습니다. 따라서 각 기능별로 모듈을 별도로 실행할 수 있으며 데이터셋만 필요한 경우 `creater.py`를, 데이터셋은 이미 폴더별로 구성되어 있고 모델 학습이 필요한 경우 `trainer.py`을, 모델 학습까지 완료되었다면 `app.py` 모듈을 기본값(-i False)으로 사용하면 local 상에서 rest api 테스트 환경을 빌드할 수 있습니다. 또한 api를 빌드하기 전에 cli 환경에서 가볍게 테스트할 수 있도록 `predicter.py` 모듈을 함께 제공하고 있습니다.
 
-### 1. data
+### 1. create datasets (./data/creater.py)
 
 root(./slic) directory에서 아래 명령을 실행하면 각 class 이름('class_A', 'class_B', 'class_C')에 해당하는 이미지를 웹에서 자동으로 다운로드합니다. 각 class별로 수집할 이미지 수는 -n 옵션으로 지정할 수 있으며 default는 50입니다. 또한, 저장되는 폴더명은 -d 옵션으로 지정할 수 있으며 default는 "datasets"입니다. 즉, ./slic/datasets 안에 각 class별 폴더가 생성됩니다.
 ```sh
@@ -45,7 +53,7 @@ parser.add_argument('-t', '--train', type=bool, default=False)
 parser.add_argument('-s', '--train_size', type=int, default=40)
 ```
 
-### 2. model
+### 2. make classification model(./model/py)
 
 root(./slic) directory에서 아래 명령을 실행하면 `datasets` 폴더에서 train, test 데이터를 가져와 모델 학습이 시작됩니다. 데이터셋 폴더가 다른 이름으로 저장되어 있다면 -d 옵션으로 새롭게 지정할 수 있습니다. 학습 과정에서 가중치 파라미터를 포함한 전체 모델은 default로 root(./slic) directory에 `model.pt`로 저장됩니다. 저장될 경로를 변경하려면 -m 옵션으로 경로를 지정해줄 수 있습니다. 이 옵션은 이미 학습한 모델을 재학습시킬때에도 사용되는데, -m 옵션으로 지정한 경로에서 모델 파일을 불러오기 때문입니다. 
 ```sh
@@ -65,6 +73,9 @@ parser.add_argument('-n', '--num_epochs', type=int, default=16)
 parser.add_argument('-t', '--train', type=bool, default=True)
 ``` 
 
+### 3. test prediction (./model/predicter.py)
+
+### 4. build test api (./app.py)
 
 ---
 > reference

@@ -6,7 +6,6 @@ from PIL import Image
 from flask import Flask, jsonify, request
 
 from model.trainer import Trainer
-from model.transformer import transformer
 
 app = Flask(__name__)
 
