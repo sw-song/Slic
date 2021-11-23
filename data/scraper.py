@@ -102,7 +102,7 @@ class Scraper:
             # 이미지로 수집이 불가능한 데이터의 경우 에러 메시지를 띄우고 count를 올리지 않는다.
             # 예외처리를 해주지 않으면 프로그램이 그대로 종료된다. 이를 방지하기 위함.
             self.count -= 1
-            print(f"[Info] ##Error Issue on url: {url}\n{e}")
+            print(f"[Info] ##Error Issue on current target-url: \n-->message : {e}")
         
     def run(self):
         # 페이지를 순회하며 각 페이지 내 최대 이미지 수만큼 수집한다(최대 이미지 수는 num_imgs)
