@@ -2,9 +2,9 @@
 
 ## 통합 실행
 
-본 패키지는 `Single line image classifier`입니다. 단 한 줄의 명령어로 나만의 이미지 데이터셋을 생성해내고 구성된 데이터셋에 따라 자동으로 이미지 분류 모델을 학습시키며 api를 개방시켜 외부 사용자의 이미지를 만들어낸 모델로 판별할 수 있도록 합니다. 패키지 구성은 아래와 같습니다.(datasets 폴더와 model.pt의 경우 본 패키지의 사용 방식에 따라 다르게 생성됩니다. 코드 파일이나 아래 "별도 실행"을 참고해주세요.)
+본 패키지는 `Single line image classifier`입니다. 단 한 줄의 명령어로 **나만의 이미지 데이터셋을 생성해내고 구성된 데이터셋에 따라 자동으로 이미지 분류 모델을 학습시키며 동시에 api를 개방시킴으로써 외부 사용자의 이미지를 판별할 수 있도록 합니다.** 패키지 구성은 아래와 같습니다.(datasets 폴더와 model.pt의 경우 본 패키지의 사용 방식에 따라 다르게 생성됩니다. 코드 파일이나 아래 "별도 실행"을 참고해주세요.)
 
-```bsh
+```sh
 |--Slic/
 |   |--data/
 |       |--creater.py
@@ -44,3 +44,22 @@ parser.add_argument('-f', '--force_replace', type=bool, default=False)
 parser.add_argument('-t', '--train', type=bool, default=False)
 parser.add_argument('-s', '--train_size', type=int, default=40)
 ```
+
+### 2. model
+
+root(./slic) directory에서 아래 명령을 실행하면 
+```sh
+
+
+
+참고할 옵션 파라미터는 아래와 같습니다.
+```python
+parser = argparse.ArgumentParser()
+parser.add_argument('-p', '--pre', type=bool, default=False)
+parser.add_argument('-m', '--model_path', type=str, default="./")
+parser.add_argument('-d', '--data_folder', type=str, default="datasets")
+parser.add_argument('-b', '--batch_size', type=int, default=4)
+parser.add_argument('-s', '--shuffle', type=bool, default=True)
+parser.add_argument('-n', '--num_epochs', type=int, default=16)
+parser.add_argument('-t', '--train', type=bool, default=True)
+``` 
