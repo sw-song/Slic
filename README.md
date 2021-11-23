@@ -56,7 +56,6 @@ $python ./model/trainer.py
 
 참고할 옵션 파라미터는 아래와 같습니다.
 ```python
-parser = argparse.ArgumentParser()
 parser.add_argument('-p', '--pre', type=bool, default=False)
 parser.add_argument('-m', '--model_path', type=str, default="./")
 parser.add_argument('-d', '--data_folder', type=str, default="datasets")
@@ -65,4 +64,14 @@ parser.add_argument('-s', '--shuffle', type=bool, default=True)
 parser.add_argument('-n', '--num_epochs', type=int, default=16)
 parser.add_argument('-t', '--train', type=bool, default=True)
 ``` 
+
+
+---
+> reference
+
+1. [(github)gurugaurav/bing_image_downloader](https://github.com/gurugaurav/bing_image_downloader)
+2. [(document)Transfer learning for computer vision tutorial](https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html)
+3. [(document)deploying with flask](https://pytorch.org/tutorials/recipes/deployment_with_flask.html)
+4. [(document)deploying pytorch in python via a rest api flask](https://pytorch.org/tutorials/intermediate/flask_rest_api_tutorial.html)
+3. [(github)avinassh/pytorch-flask-api](https://github.com/avinassh/pytorch-flask-api)
 

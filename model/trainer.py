@@ -217,7 +217,7 @@ class Trainer:
 
             # ---- 평가 모니터링 ----
             print(f"[Info] Loss : {eval_loss:.2f} Accuracy : {eval_acc:.2f} Time : {time.time() - start_time}")
-
+        
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
