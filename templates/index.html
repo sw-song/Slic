@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<head>
+    <title> 
+        home
+    </title>
+<body>
+    <div class="container">
+    <h1>Slic Server</h1>
+    <h2>image upload</h2>
+    {% if filename %}
+        <div>
+            <img src= "{{ src }}">
+        </div>
+    
+        <div>
+            <p>{{ pred }}</p>
+        </div>
+    {% endif %}
+    <form method="post" action="/upload" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit" value="submit">
+    </form>
+    </div>
+</body>
+</head>

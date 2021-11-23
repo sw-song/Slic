@@ -7,7 +7,10 @@ import torch.optim as optim
 # torchvision : 이미지 변환 유틸리티 제공(데이터셋, 데이터 변환 등)
 import torchvision
 # from torchvision import datasets, models, transforms
-from transformer import transformer
+if __name__ == '__main__':
+    from transformer import transformer
+else:
+    from model.transformer import transformer
 
 import numpy as np
 # time : 시간 불러오기 등, 모니터링을 위함

@@ -4,30 +4,32 @@ import os
 
 from PIL import Image
 from flask import Flask, jsonify, request
-
-from model.trainer import Trainer
+from flask.templating import render_template
+from model import predictor
 
 app = Flask(__name__)
+app.config['UPLOAD'] = 'static/uploads'
 
-t = Trainer(pre=True)
+@app.route('/', methods=['GET'])
+def root():
+    return render_template('index.html')
 
-# HTTP 요청(POST)으로 받은 img를 PyTorch 모델이 받을 수 있도록 변환
-def img_to_tensor(img):
-    img = Image.open(img)
-    # 받은 image를 (3, 224, 224)로 변환
-    tensor_img = t.trans_test(img)
-    # 4차원으로 변환 (1, 3, 224, 224)
-    tensor_img.unsqueeze_(0)
-    return tensor_img
+@app.route('/upload', methods=['POST'])
+def upload():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file:
+            file_name = file.filename 
+            if '.' in file_name and file_name.rsplit('.', 1)[1] in ['jpg', 'png', 'jpeg']:
+                src_path = os.path.join(app.config['UPLOAD'], file_name)
+                file.save(src_path)
+                pred = predictor.img_prediction(predictor.img_to_tensor(file))
+                return render_template('index.html', src=src_path, pred=str(pred))
+            return render_template('index.html', pred="파일 형식을 jpg, png, jpeg로 맞춰주세요.")
+        return render_template('index.html', pred="파일 에러")
 
-def img_prediction(tensor_img):
-    outputs = t.model(tensor_img)
-    _, pred_idx = outputs.max(1)
-    return t.class_list[pred_idx.item()]
-
-
-
-
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
             
 
 
