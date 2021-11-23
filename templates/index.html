@@ -7,13 +7,13 @@
     <div class="container">
     <h1>Slic Server</h1>
     <h2>image upload</h2>
-    {% if src %}
+    {% if pred %}
         <div>
             <img src= "{{ src }}" width="50%" height="50%">
         </div>
     
         <div>
-            <h1>{{ pred }}</h1>
+            <p><b> {{ pred }} </b></p>
         </div>
     {% endif %}
     <form method="post" action="/upload" enctype="multipart/form-data">
