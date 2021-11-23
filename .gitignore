@@ -179,3 +179,6 @@ model.pt
 
 ## uploads 파일 추적 금지
 static/uploads/*
+
+## uploads 폴더는 보이게.
+!static/uploads/.keep
