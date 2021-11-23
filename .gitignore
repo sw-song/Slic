@@ -176,3 +176,6 @@ cython_debug/
 ## 데이터셋, 모델파일 추적금지
 datasets/
 model.pt
+
+## uploads 파일 추적 금지
+static/uploads/*

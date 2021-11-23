@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <head>
     <title> 
-        home
+        test-api (local server)
     </title>
 <body>
     <div class="container">
     <h1>Slic Server</h1>
     <h2>image upload</h2>
-    {% if filename %}
+    {% if src %}
         <div>
-            <img src= "{{ src }}">
+            <img src= "{{ src }}" width="50%" height="50%">
         </div>
     
         <div>
-            <p>{{ pred }}</p>
+            <h1>{{ pred }}</h1>
         </div>
     {% endif %}
     <form method="post" action="/upload" enctype="multipart/form-data">
