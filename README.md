@@ -45,6 +45,7 @@ parser.add_argument('-ne', '--num_epochs', type=int, default=16)
 ```
 
 다음은 정상적으로 빌드되었을 때의 최종 결과물입니다.
+
 <img src="./_src/test.gif" width="40%" height="40%">
 
 ---
