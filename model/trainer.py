@@ -25,6 +25,15 @@ class Trainer:
         # 데이터 폴더 지정
         cwd = os.getcwd()
         self.data_path = os.path.join(cwd, data_folder)
+        
+        if not os.path.exists(self.data_path):
+            # 폴더가 존재하지 않으면 폴더 생성
+            os.mkdir(self.data_path)
+
+        if not os.path.exists(os.path.join(self.data_path, 'train')):
+            # 폴더가 존재하지 않으면 폴더 생성
+            os.mkdir(os.path.join(self.data_path, 'train'))
+
         self.class_list = os.listdir(f"{self.data_path}/train")
         self.class_list = [f for f in self.class_list if not '.' in f]
         

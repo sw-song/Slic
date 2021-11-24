@@ -1,0 +1,17 @@
+certifi==2021.10.8
+click==8.0.3
+colorama==0.4.4
+Flask==2.0.2
+importlib-metadata==4.8.2
+itsdangerous==2.0.1
+Jinja2==3.0.3
+MarkupSafe==2.0.1
+numpy==1.21.4
+Pillow==8.4.0
+torch==1.10.0
+torchaudio==0.10.0
+torchvision==0.11.1
+typing_extensions==4.0.0
+Werkzeug==2.0.2
+wincertstore==0.2
+zipp==3.6.0
