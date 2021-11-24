@@ -14,6 +14,9 @@
 |       |--transformer.py
 |       |--predicter.py
 |   |--app.py
+|   |--staticc/uploads/
+|   |--templates/
+|       |--index.html
 |   |-(datasets/)
 |   |-(model.pt)
 
@@ -96,7 +99,7 @@ parser.add_argument('-ne', '--num_epochs', type=int, default=16)
 ``` 
 
 ### 3. test prediction (./model/predicter.py)
-학습한 모델을 cli 환경에서 테스트해볼 수 있습니다. 분류할 클래스 중 하나에 해당하는 1장의 이미지를 준비한 다음 아래 명령을 실행하세요. 이 때, -f 옵션으로 이미지 경로를 지정해줍니다.
+학습한 모델을 cli 환경에서 테스트해볼 수 있습니다. 분류할 클래스 중 하나에 해당하는 1장의 이미지를 준비한 다음 아래 명령을 실행하세요. 이 때, -f 옵션으로 이미지 경로를 지정해줍니다. 본 모델을 사용할 경우 반드시 사전에 학습시킨 model.pt파일을 root 경로에 포함시켜야 합니다.
 ```python
 $python ./model/predictor.py -f "./example_image.jpg"
 ```
