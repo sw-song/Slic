@@ -5,7 +5,10 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from model.trainer import Trainer
 
-t = Trainer(pre=True)
+try:
+    t = Trainer(pre=True)
+except:
+    print("[Error]model.pt 파일이 root 경로에 있는지 확인하세요.")
 
 # img를 PyTorch 모델이 받을 수 있도록 변환
 def img_to_tensor(img):
