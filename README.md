@@ -86,6 +86,7 @@ parser.add_argument('-ts', '--train_size', type=int, default=40)
 ```
 
 다음은 이미지 데이터 수집기가 정상적으로 실행되는 모습입니다.
+
 <img src="./_src/img_scrap.gif" width="40%" height="40%">
 
 ### 2. make classification model(./model/py)
