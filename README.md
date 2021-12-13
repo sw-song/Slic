@@ -85,6 +85,9 @@ parser.add_argument('-t', '--train', type=bool, default=True)
 parser.add_argument('-ts', '--train_size', type=int, default=40)
 ```
 
+다음은 이미지 데이터 수집기가 정상적으로 실행되는 모습입니다.
+<img src="./_src/img_scrap.gif" width="40%" height="40%">
+
 ### 2. make classification model(./model/py)
 
 root(./slic) directory에서 아래 명령을 실행하면 `datasets` 폴더에서 train, test 데이터를 가져와 모델 학습이 시작됩니다. 데이터셋 폴더가 다른 이름으로 저장되어 있다면 -df 옵션으로 새롭게 지정할 수 있습니다. 학습 과정에서 가중치 파라미터를 포함한 전체 모델은 default로 root(./slic) directory에 `model.pt`로 저장됩니다. 저장될 경로를 변경하려면 -m 옵션으로 경로를 지정해줄 수 있습니다. 이 옵션은 이미 학습한 모델을 재학습시킬때에도 사용되는데, -m 옵션으로 지정한 경로에서 모델 파일을 불러오기 때문입니다. 
